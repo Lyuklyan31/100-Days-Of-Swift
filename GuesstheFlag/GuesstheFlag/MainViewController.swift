@@ -10,6 +10,7 @@ import UIKit
 
 class MainViewController: UIViewController {
     
+    private let resultLabel = UILabel()
     private let buttonOne = UIButton()
     private let buttonTwo = UIButton()
     private let buttonThree = UIButton()
@@ -27,7 +28,6 @@ class MainViewController: UIViewController {
         setupUI()
         countriesAppend()
         setupNavigationBar()
-      
     }
     
     private func setupNavigationBar() {
@@ -45,13 +45,28 @@ class MainViewController: UIViewController {
         setupButtonOne()
         setupButtonTwo()
         setupButtonThree()
+        setupResultLabel()
+    }
+    
+    private func setupResultLabel() {
+        resultLabel.text = "Score \(score)"
+        resultLabel.font = resultLabel.font.withSize(20)
+        
+        view.addSubview(resultLabel)
+        
+        resultLabel.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(buttonThree.snp.bottom).offset(40)
+        }
     }
     
     private func setupButtonOne() {
         buttonOne.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         buttonOne.layer.borderWidth = 1
         buttonOne.layer.borderColor = UIColor.lightGray.cgColor
+        
         view.addSubview(buttonOne)
+        
         buttonOne.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.centerY.equalToSuperview()
@@ -64,7 +79,9 @@ class MainViewController: UIViewController {
         buttonTwo.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         buttonTwo.layer.borderWidth = 1
         buttonTwo.layer.borderColor = UIColor.lightGray.cgColor
+        
         view.addSubview(buttonTwo)
+        
         buttonTwo.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.bottom.equalTo(buttonOne.snp.top).offset(-25)
@@ -77,7 +94,9 @@ class MainViewController: UIViewController {
         buttonThree.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         buttonThree.layer.borderWidth = 1
         buttonThree.layer.borderColor = UIColor.lightGray.cgColor
+        
         view.addSubview(buttonThree)
+        
         buttonThree.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(buttonOne.snp.bottom).offset(25)
@@ -87,14 +106,17 @@ class MainViewController: UIViewController {
     }
     
     @objc func buttonTapped(_ sender: UIButton) {
-        
         if sender.tag == correctAnswer {
             title = "Correct"
             score += 1
         } else {
             title = "Wrong"
-            score -= 1
+            score = (score == 0) ? 0 : score - 1
         }
+        
+        // Оновлення тексту resultLabel
+        resultLabel.text = "Score \(score)"
+        
         let ac = UIAlertController(title: title, message: "Your score is \(score).", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Continue", style: .default, handler: askQuestion))
         present(ac, animated: true)
@@ -108,7 +130,6 @@ class MainViewController: UIViewController {
     func askQuestion(action: UIAlertAction! = nil) {
         countries.shuffle()
         
-        correctAnswer = Int.random(in: 0...2)
         buttonOne.setImage(UIImage(named: countries[0]), for: .normal)
         buttonTwo.setImage(UIImage(named: countries[1]), for: .normal)
         buttonThree.setImage(UIImage(named: countries[2]), for: .normal)
@@ -116,5 +137,8 @@ class MainViewController: UIViewController {
         correctAnswer = Int.random(in: 0...2)
         title = countries[correctAnswer].uppercased()
         
+        buttonOne.tag = 0
+        buttonTwo.tag = 1
+        buttonThree.tag = 2
     }
 }
